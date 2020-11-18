@@ -56,6 +56,9 @@ element_config:
     preferredDomain: jitsi.riot.im
 element_domain_configs: []
 element_deployment_method: 'webroot' #alternative is 'docker'
+element_docker_image: "{{ element_docker_image_base }}:{{ element_docker_image_tag }}"
+element_docker_image_base: "docker.io/vectorim/element-web"
+element_docker_image_tag: "v{{ element_version }}"
 element_docker_ports: []
 element_docker_labels: {}
 element_docker_volumes: "{{ element_docker_main_volumes + element_docker_domain_volumes }}"

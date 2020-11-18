@@ -1,4 +1,4 @@
 ---
 element_docker_labels_complete: "{{ element_docker_labels_base | combine(element_docker_labels) }}"
 element_docker_labels_base:
-  version: "{{ element_version }}"
+  version: "{{ element_docker_image_tag | default(element_version, true) }}"
