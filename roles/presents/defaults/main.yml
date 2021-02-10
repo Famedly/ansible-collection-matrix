@@ -1,0 +1,14 @@
+---
+# defaults file for presents
+matrix_presents_base_path: /opt/matrix-presents
+
+matrix_presents_container_name: matrix-presents
+matrix_presents_container_ref: registry.gitlab.com/famedly/services/matrix-presents
+matrix_presents_container_tag: master
+
+matrix_presents_docker_networks: []
+matrix_presents_docker_etc_hosts: {}
+matrix_presents_docker_ports: ["8080:8080"]
+matrix_presents_docker_labels: {}
+matrix_presents_docker_volumes:
+  - "{{ matrix_presents_base_path }}/config.json:/data/config.json"

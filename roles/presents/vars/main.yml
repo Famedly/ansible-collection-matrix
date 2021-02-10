@@ -1,0 +1,5 @@
+---
+# vars file for presents
+matrix_presents_config:
+  guest_homeserver: "{{ matrix_presents_guest_homeserver }}"
+  base_uri: "{{ matrix_presents_base_uri }}"

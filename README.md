@@ -23,6 +23,7 @@ deploying commonly used matrix services:
 
  - **synapse**: Homeserver, this is where your accounts live.
  - **element**: Web client, for using your accounts.
+ - **presents**: Slideshow focused matrix client.
 
 For details on using these, look at the README.md in the respective
 role directory.

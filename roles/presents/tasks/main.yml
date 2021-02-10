@@ -1,0 +1,40 @@
+---
+# tasks file for presents
+- name: create user
+  become: yes
+  user:
+    name: matrix-presents
+    state: present
+  register: presents_user
+
+- name: create directory
+  become: yes
+  file:
+    path: "{{ matrix_presents_base_path }}"
+    state: "directory"
+    owner: matrix-presents
+    group: matrix-presents
+    mode: 0750
+
+- name: template config
+  become: yes
+  copy:
+    content: "{{ matrix_presents_config | to_nice_json }}"
+    dest: "{{ matrix_presents_base_path }}/config.json"
+    owner: matrix-presents
+    group: matrix-presents
+    mode: 0644
+
+- name: start container
+  become: yes
+  docker_container:
+    name: "{{ matrix_presents_container_name }}"
+    image: "{{ matrix_presents_container_ref }}:{{ matrix_presents_container_tag }}"
+    networks: "{{ matrix_presents_docker_networks }}"
+    etc_hosts: "{{ matrix_presents_docker_etc_hosts }}"
+    ports: "{{ matrix_presents_docker_ports }}"
+    labels: "{{ matrix_presents_docker_labels }}"
+    restart_policy: "unless-stopped"
+    pull: true
+    user: "{{ presents_user.uid }}:{{ presents_user.group }}"
+    volumes: "{{ matrix_presents_docker_volumes }}"
