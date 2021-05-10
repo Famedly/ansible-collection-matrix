@@ -3,21 +3,25 @@
   file:
     dest: "{{ element_webapp_dir }}"
     state: directory
+  tags: ['prepare', 'prepare-element']
 
 - name: Download and install element web app
   import_tasks: download.yml
   when: element_deployment_method == "webroot"
+  tags: ['prepare', 'prepare-element']
 
 - name: Write main configuration
   copy:
     content: "{{ element_config | to_nice_json }}"
     dest: "{{ element_webapp_dir }}/config.json"
+  tags: ['configure', 'configure-element']
 
 - name: Write domain specific configurations
   copy:
     content: "{{ item.config | to_nice_json }}"
     dest: "{{ element_webapp_dir }}/config.{{ item.domain }}.json"
   loop: "{{ element_domain_configs }}"
+  tags: ['configure', 'configure-element']
 
 - name: Link main configuration
   file:
@@ -25,6 +29,7 @@
     dest: "{{ element_webapp_dir }}/element-v{{ element_version }}/config.json"
     state: link
   when: element_deployment_method == "webroot"
+  tags: ['configure', 'configure-element']
 
 - name: Link domain specific configurations
   file:
@@ -33,13 +38,25 @@
     state: link
   loop: "{{ element_domain_configs }}"
   when: element_deployment_method == "webroot"
+  tags: ['configure', 'configure-element']
 
-- name: Deploy docker container
+- name: Ensure element container image is present
+  docker_image:
+    name: "docker.io/vectorim/element-web:v{{ element_version }}"
+    force_source: "{{ element_container_image_force_pull }}"
+    source: pull
+    state: present
+  when: element_deployment_method == "docker"
+  tags: ['prepare', 'prepare-element']
+
+- name: Ensure element container image is started
   docker_container:
     name: "element-web"
     image: "docker.io/vectorim/element-web:v{{ element_version }}"
     ports: "{{ element_docker_ports }}"
     labels: "{{ element_docker_labels_complete }}"
-    restart_policy: unless-stopped
     volumes: "{{ element_docker_volumes }}"
+    restart_policy: unless-stopped
+    state: started
   when: element_deployment_method == "docker"
+  tags: ['deploy', 'deploy-element']
