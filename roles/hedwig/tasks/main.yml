@@ -6,6 +6,7 @@
     state: present
     system: yes
   register: hedwig_user_res
+  tasks: ['prepare', 'prepare-hedwig']
 
 - name: Ensure host directories are present
   file:
@@ -13,6 +14,7 @@
     state: directory
     owner: "{{ hedwig_user_res.uid }}"
     group: "{{ hedwig_user_res.group }}"
+  tasks: ['prepare', 'prepare-hedwig']
 
 - name: Template configuration file for hedwig
   copy:
@@ -22,8 +24,17 @@
     group: "{{ hedwig_user_res.group }}"
     mode: 0770
   notify: restart-hedwig
+  tasks: ['configure', 'configure-hedwig']
 
-- name: Start hedwig container
+- name: Ensure hedwig container image is present
+  docker_image:
+    name: "{{ hedwig_container_image }}"
+    force_source: "{{ hedwig_container_image_force_pull | default(True) }}"
+    source: pull
+    state: present
+  tasks: ['prepare', 'prepare-hedwig']
+
+- name: Ensure hedwig container is started
   docker_container:
     name: "{{ hedwig_container_name }}"
     image: "{{ hedwig_container_image }}"
@@ -33,7 +44,7 @@
     labels: "{{ hedwig_container_labels_complete }}"
     volumes: "{{ hedwig_container_volumes }}"
     restart_policy: "{{ hedwig_container_restart_policy }}"
-    pull: true
     healthcheck:
       test: "curl http://127.0.0.1:{{ hedwig_server_port }}/health || exit 1"
     state: started
+  tasks: ['deploy', 'deploy-hedwig']
