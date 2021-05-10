@@ -1,5 +1,7 @@
 # Barad-dûr role
-Role to set up [Barad-dûr](https://gitlab.com/famedly/services/barad-dur), a matrix phone-home stats collector running in a  docker container.
+
+Role to set up [Barad-dûr](https://gitlab.com/famedly/services/barad-dur),
+a matrix phone-home stats collector running in a docker container.
 
 ## Usage
 The database connection has to be defined in the playbook:
@@ -9,7 +11,11 @@ barad_dur_database_password: "super_secret_password"
 barad_dur_database_host: "serverhost"
 barad_dur_database_name: "barad-dur"
 ```
-The default scheme and port are set up for postgres, it can be changed with the `barad_dur_database_scheme` and `barad_dur_database_port` parameters respectively.
+The default scheme and port are set up for postgres,
+it can be changed with the `barad_dur_database_scheme` and `barad_dur_database_port` parameters respectively.
 
 
-By default, all config files are placed in `/opt/barad-dur`.
+By default, all config files are placed in `/opt/barad-dur` (see `barad_dur_base_path` in `defaults/`).
+
+You can force docker to pull the image with `barad_dur_container_image_force_pull: True`,
+in case an existing (but different) image with the same tag exists locally.
