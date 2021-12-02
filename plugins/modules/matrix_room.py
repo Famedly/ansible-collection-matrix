@@ -64,7 +64,8 @@ from ansible_collections.famedly.matrix.plugins.module_utils.matrix import *
 
 async def run_module():
     module_args = dict(
-        alias=dict(type='str', required=True)
+        alias=dict(type='str', required=True),
+        room_version=dict(type='str', required=False, default=None)
     )
 
     result = dict(
@@ -100,13 +101,17 @@ async def run_module():
             else:
                 failed = True
                 result = {"msg": "Room exists, but couldn't join: {1}".format(join_resp)}
+        # Check room version
+        if not module.params['room_version'] is None:
+            room_info = await client.room_resolve_alias(module.params['alias'])
+            result['debug'] = str(room_info)
     else:
         # Get local part of alias
         local_part_regex = re.search("#([^:]*):(.*)", module.params['alias'])
         local_part = local_part_regex.groups()[0]
 
         # Try to create room with alias
-        create_room_resp = await client.room_create(alias=local_part)
+        create_room_resp = await client.room_create(alias=local_part, room_version=module.params['room_version'])
 
         # If successful, exit with changed=true and room_id
         if isinstance(create_room_resp, RoomCreateResponse):
